@@ -19,6 +19,11 @@ export class UsersController {
     return this.userService.findOne(userId);
   }
 
+  @Get(':userId/orders')
+  getOrders(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.getOrdersByUser(userId);
+  }
+
   @Get()
   getAll() {
     return this.userService.findAll();
