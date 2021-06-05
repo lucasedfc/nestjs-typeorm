@@ -13,14 +13,15 @@ import {
 import { CreateProductDto, UpdateProductDto } from './../dtos/products.dto';
 import { ProductsService } from '../services/products.service';
 import { ParseIntPipe } from '../../shared/parse-int.pipe';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+@ApiTags('Products')
 @Controller('products')
 export class ProductsController {
   constructor(private productService: ProductsService) {}
   @Get('')
+  @ApiOperation({ summary: 'List All Products' })
   // eslint-disable-next-line prettier/prettier
-  getProducts /*  @Query('limit') limit = 100, */() /*  @Query('offset') offset = 0, */
-  /*  @Query('brand') brand: string, */
-  {
+  getProducts /*  @Query('limit') limit = 100, */ /*  @Query('offset') offset = 0, */ /*  @Query('brand') brand: string, */() {
     // return {
     //   message: `products: limit => ${limit} offset => ${offset} brand => ${brand}`,
     // };
@@ -35,6 +36,7 @@ export class ProductsController {
   }
 
   @Get(':productId')
+  @ApiOperation({ summary: 'Get One Product' })
   @HttpCode(HttpStatus.ACCEPTED)
   getOne(@Param('productId', ParseIntPipe) productId: number) {
     // Express Way
