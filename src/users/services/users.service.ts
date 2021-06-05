@@ -1,4 +1,3 @@
-import { Inject } from '@nestjs/common';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductsService } from 'src/products/services/products.service';
 import { CreateUsersDto, UpdateUsersDto } from 'src/users/dtos/users.dto';

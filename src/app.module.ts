@@ -5,6 +5,7 @@ import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { environment } from './environment';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     HttpModule,
     DatabaseModule,
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: environment[process.env.NODE_ENV] || '.env',
       isGlobal: true,
     }),
   ],
