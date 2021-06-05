@@ -8,10 +8,11 @@ export class AppService {
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
     @Inject('TASKS') private tasks: any[],
   ) {}
-  getHello(): string {
+  getHello(): { [key: string]: string } {
     // console.log('tasks', this.tasks);
     // console.log('database', this.configService.get<string>('DATABASE_NAME'));
-    console.log('database', this.configService.database.name);
-    return `Hello World!`;
+    return {
+      message: `Ready To Receive Request On ${this.configService.configuration} Configuration`,
+    };
   }
 }

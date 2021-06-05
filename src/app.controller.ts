@@ -6,17 +6,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
+  getHello(): { [key: string]: string } {
     return this.appService.getHello();
-  }
-
-  @Get('new')
-  newEndpoint(): string {
-    return 'New endpoint!';
-  }
-
-  @Get('/route/')
-  hello() {
-    return 'Route with /slash/';
   }
 }
