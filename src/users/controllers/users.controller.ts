@@ -15,6 +15,12 @@ import { UsersService } from '../services/users.service';
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
+
+  @Get('tasks')
+  getTask() {
+    return this.userService.getTasks();
+  }
+
   @Get(':userId')
   getOne(@Param('userId', ParseIntPipe) userId: number) {
     return this.userService.findOne(userId);
