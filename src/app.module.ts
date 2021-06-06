@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { environment } from './environment';
 import config from './config';
+
 @Module({
   imports: [
     ProductsModule,
