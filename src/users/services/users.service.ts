@@ -1,17 +1,14 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductsService } from 'src/products/services/products.service';
 import { CreateUsersDto, UpdateUsersDto } from 'src/users/dtos/users.dto';
 import { User } from 'src/users/entities/user.entity';
-import { Order } from '../entities/order.entity';
 import { ConfigService } from '@nestjs/config';
-import { Client } from 'pg';
 
 @Injectable()
 export class UsersService {
   constructor(
     private productService: ProductsService,
-    private configService: ConfigService,
-    @Inject('PG') private pgClient: Client,
+    private configService: ConfigService, // @Inject('PG') private pgClient: Client,
   ) {}
   private counterId = 1;
   private users: User[] = [
@@ -71,24 +68,24 @@ export class UsersService {
     }
   }
 
-  getOrdersByUser(id: number): Order {
+  async getOrdersByUser(id: number) {
     const user = this.findOne(id);
     return {
       date: new Date(),
       user: user,
-      products: this.productService.findAll(),
+      products: await this.productService.findAll(),
     };
   }
 
-  getTasks() {
-    return new Promise((resolve, reject) => {
-      this.pgClient.query(
-        'SELECT * FROM public.tasks ORDER BY id ASC',
-        (err, res) => {
-          if (err) reject(err);
-          resolve(res.rows);
-        },
-      );
-    });
-  }
+  // getTasks() {
+  //   return new Promise((resolve, reject) => {
+  //     this.pgClient.query(
+  //       'SELECT * FROM public.tasks ORDER BY id ASC',
+  //       (err, res) => {
+  //         if (err) reject(err);
+  //         resolve(res.rows);
+  //       },
+  //     );
+  //   });
+  // }
 }

@@ -18,7 +18,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  @Max(10)
+  @Max(10000)
   readonly price: number;
   @IsNotEmpty()
   @IsNumber()

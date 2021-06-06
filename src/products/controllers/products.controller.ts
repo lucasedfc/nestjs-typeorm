@@ -22,49 +22,31 @@ export class ProductsController {
   @ApiOperation({ summary: 'List All Products' })
   // eslint-disable-next-line prettier/prettier
   getProducts /*  @Query('limit') limit = 100, */ /*  @Query('offset') offset = 0, */ /*  @Query('brand') brand: string, */() {
-    // return {
-    //   message: `products: limit => ${limit} offset => ${offset} brand => ${brand}`,
-    // };
     return this.productService.findAll();
-  }
-
-  @Get('filter')
-  getProductFilter() {
-    return {
-      message: `i'm a filter`,
-    };
   }
 
   @Get(':productId')
   @ApiOperation({ summary: 'Get One Product' })
   @HttpCode(HttpStatus.ACCEPTED)
   getOne(@Param('productId', ParseIntPipe) productId: number) {
-    // Express Way
-    // response.status(200).send({
-    //   message: `product with id ${productId}`,
-    // });
-    // return {
-    //   message: `product with id ${productId}`,
-    // };
     return this.productService.findOne(productId);
   }
 
   @Post()
   create(@Body() payload: CreateProductDto) {
-    // return {
-    //   message: 'Create action',
-    //   payload,
-    // };
     return this.productService.create(payload);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() payload: UpdateProductDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateProductDto,
+  ) {
     return this.productService.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number) {
+  delete(@Param('id', ParseIntPipe) id: number) {
     return this.productService.delete(id);
   }
 }

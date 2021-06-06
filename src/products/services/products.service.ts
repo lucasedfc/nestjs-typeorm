@@ -1,27 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dto';
 import { Product } from '../entities/product.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
-  private counterId = 1;
-  private products: Product[] = [
-    {
-      id: 1,
-      name: 'product 1',
-      description: 'lorem ipsum',
-      price: 321,
-      image: '',
-      stock: 21,
-    },
-  ];
+  constructor(
+    @InjectRepository(Product) private productRepo: Repository<Product>,
+  ) {}
 
   findAll() {
-    return this.products;
+    return this.productRepo.find();
   }
 
-  findOne(id: number) {
-    const product = this.products.find((item) => item.id == id);
+  async findOne(id: number) {
+    const product = await this.productRepo.findOne(id);
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
@@ -29,36 +27,30 @@ export class ProductsService {
   }
 
   create(payload: CreateProductDto) {
-    this.counterId++;
-    const newProduct = {
-      id: this.counterId,
-      ...payload,
+    const newProduct = this.productRepo.create(payload);
+    const product = this.productRepo
+      .save(newProduct)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw new BadRequestException(`${err.message || 'Unexpected Error'}`);
+      });
+
+    return product;
+  }
+
+  async update(id: number, payload: UpdateProductDto) {
+    const product = await this.findOne(id);
+    this.productRepo.merge(product, payload);
+    return this.productRepo.save(product);
+  }
+
+  async delete(id: number) {
+    await this.findOne(id);
+    this.productRepo.delete(id);
+    return {
+      message: `Product with id ${id} deleted`,
     };
-    this.products.push(newProduct);
-    return newProduct;
-  }
-
-  update(id: number, payload: UpdateProductDto) {
-    const product = this.findOne(id);
-    if (product) {
-      const index = this.products.findIndex((item) => item.id === id);
-      this.products[index] = {
-        ...product,
-        ...payload,
-      };
-      return this.products[index];
-    }
-    return null;
-  }
-
-  delete(id: number) {
-    const product = this.findOne(id);
-    if (product) {
-      const index = this.products.findIndex((item) => item.id === product.id);
-      this.products.splice(index, 1);
-      return {
-        message: `Product with id ${id} deleted`,
-      };
-    }
   }
 }
