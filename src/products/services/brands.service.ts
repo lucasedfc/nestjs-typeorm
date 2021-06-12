@@ -1,24 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBrandsDto, UpdateBrandsDto } from 'src/products/dtos/brands.dto';
 import { Brand } from 'src/products/entities/brand.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class BrandsService {
-  private counterId = 1;
-  private brands: Brand[] = [
-    {
-      id: 1,
-      name: 'Asus',
-      description: 'ROG',
-    },
-  ];
+  constructor(@InjectRepository(Brand) private brandRepo: Repository<Brand>) {}
 
   findAll() {
-    return this.brands;
+    return this.brandRepo.find();
   }
 
-  findOne(id: number) {
-    const brand = this.brands.find((item) => item.id === id);
+  async findOne(id: number) {
+    const brand = await this.brandRepo.findOne(id);
     if (!brand) {
       throw new NotFoundException(`Brand with id ${id} not found`);
     }
@@ -26,35 +25,37 @@ export class BrandsService {
   }
 
   create(payload: CreateBrandsDto) {
-    this.counterId++;
-    const newBrand = {
-      id: this.counterId,
-      ...payload,
+    const newBrand = this.brandRepo.create(payload);
+    const brand = this.brandRepo
+      .save(newBrand)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw new BadRequestException(`${err.message || 'Unexpected Error'}`);
+      });
+    return brand;
+  }
+
+  async update(id: number, payload: UpdateBrandsDto) {
+    const brand = await this.findOne(id);
+    this.brandRepo.merge(brand, payload);
+    const updatedBrand = this.brandRepo
+      .save(brand)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw new BadRequestException(`${err.message || 'Unexpected Error'}`);
+      });
+    return updatedBrand;
+  }
+
+  async delete(id: number) {
+    await this.findOne(id);
+    this.brandRepo.delete(id);
+    return {
+      message: `Brand with id ${id} deleted`,
     };
-    this.brands.push(newBrand);
-    return newBrand;
-  }
-
-  update(id: number, payload: UpdateBrandsDto) {
-    const brand = this.findOne(id);
-    if (brand) {
-      const index = this.brands.findIndex((item) => item.id === id);
-      this.brands[index] = {
-        ...brand,
-        ...payload,
-      };
-      return this.brands[index];
-    }
-  }
-
-  delete(id: number) {
-    const brand = this.findOne(id);
-    if (brand) {
-      const index = this.brands.findIndex((item) => item.id === id);
-      this.brands.splice(index, 1);
-      return {
-        message: `Brand with id ${id} deleted`,
-      };
-    }
   }
 }
