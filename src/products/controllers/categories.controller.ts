@@ -16,10 +16,6 @@ import { CategoriesService } from '../services/categories.service';
 @Controller('categories')
 export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
-  // @Get(':id/:products/:productId')
-  // getCategory(@Param('productId') productId: string, @Param('id') id: string) {
-  //   return `product ${productId} and ${id}`;
-  // }
 
   @Get(':categoryId')
   getOne(@Param('categoryId', ParseIntPipe) categoryId: number) {
