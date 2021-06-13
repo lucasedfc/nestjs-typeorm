@@ -1,71 +1,66 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ProductsService } from 'src/products/services/products.service';
 import { CreateUsersDto, UpdateUsersDto } from 'src/users/dtos/users.dto';
 import { User } from 'src/users/entities/user.entity';
-import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
     private productService: ProductsService,
-    private configService: ConfigService, // @Inject('PG') private pgClient: Client,
+    @InjectRepository(User) private userRepo: Repository<User>,
   ) {}
-  private counterId = 1;
-  private users: User[] = [
-    {
-      id: 1,
-      name: 'lucasedfc',
-      lastName: 'heim',
-    },
-  ];
 
   create(payload: CreateUsersDto) {
-    this.counterId++;
-    const newUser = {
-      id: this.counterId,
-      ...payload,
-    };
-    this.users.push(newUser);
+    const user = this.userRepo.create(payload);
+    const newUser = this.userRepo
+      .save(user)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw new BadRequestException(`${err.message || 'Unexpected Error'}`);
+      });
+
     return newUser;
   }
 
   findAll() {
-    const apiKey = this.configService.get('API_KEY');
-    const database = this.configService.get('DATABASE_NAME');
-    console.log('data', apiKey, database);
-
-    return this.users;
+    return this.userRepo.find();
   }
 
-  findOne(id: number) {
-    const user = this.users.find((item) => item.id === id);
-
+  async findOne(id: number) {
+    const user = await this.userRepo.findOne(id);
     if (!user) {
       throw new NotFoundException(`user with id ${id} not exist`);
     }
     return user;
   }
 
-  update(id: number, payload: UpdateUsersDto) {
-    const user = this.findOne(id);
-    if (user) {
-      const index = this.users.findIndex((item) => item.id === id);
-      this.users[index] = {
-        ...user,
-        ...payload,
-      };
+  async update(id: number, payload: UpdateUsersDto) {
+    const user = await this.findOne(id);
+    this.userRepo.merge(user, payload);
+    const updatedUser = this.userRepo
+      .save(user)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw new BadRequestException(`${err.message || 'Unexpected Error'}`);
+      });
 
-      return this.users[index];
-    }
+    return updatedUser;
   }
 
-  delete(id: number) {
-    const user = this.findOne(id);
-    if (user) {
-      const index = this.users.findIndex((item) => item.id === id);
-      this.users.splice(index, 1);
-      return { message: `user with id ${id} deleted` };
-    }
+  async delete(id: number) {
+    await this.findOne(id);
+    this.userRepo.delete(id);
+    return { message: `user with id ${id} deleted` };
   }
 
   async getOrdersByUser(id: number) {
@@ -76,16 +71,4 @@ export class UsersService {
       products: await this.productService.findAll(),
     };
   }
-
-  // getTasks() {
-  //   return new Promise((resolve, reject) => {
-  //     this.pgClient.query(
-  //       'SELECT * FROM public.tasks ORDER BY id ASC',
-  //       (err, res) => {
-  //         if (err) reject(err);
-  //         resolve(res.rows);
-  //       },
-  //     );
-  //   });
-  // }
 }

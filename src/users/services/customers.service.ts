@@ -1,58 +1,62 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Customer } from '../../users/entities/customer.entity';
 import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customers.dto';
 
 @Injectable()
 export class CustomersService {
-  private counterId = 1;
-  private customers: Customer[] = [
-    {
-      id: 1,
-      name: 'General Motors',
-    },
-  ];
+  constructor(
+    @InjectRepository(Customer) private customerRepo: Repository<Customer>,
+  ) {}
 
   create(payload: CreateCustomerDto) {
-    this.counterId++;
-    const newCustomer = {
-      id: this.counterId,
-      ...payload,
-    };
-    this.customers.push(newCustomer);
+    const customer = this.customerRepo.create(payload);
+    const newCustomer = this.customerRepo
+      .save(customer)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw new BadRequestException(`${err.message || 'Unexpected Error'}`);
+      });
     return newCustomer;
   }
 
   findAll() {
-    return this.customers;
+    return this.customerRepo.find();
   }
 
-  findOne(id: number) {
-    const customer = this.customers.find((item) => item.id === id);
+  async findOne(id: number) {
+    const customer = await this.customerRepo.findOne(id);
     if (!customer) {
       throw new NotFoundException(`customer with id ${id} not exist`);
     }
     return customer;
   }
 
-  update(id: number, payload: UpdateCustomerDto) {
-    const customer = this.findOne(id);
-    if (customer) {
-      const index = this.customers.findIndex((item) => item.id === id);
-      this.customers[index] = {
-        ...customer,
-        ...payload,
-      };
+  async update(id: number, payload: UpdateCustomerDto) {
+    const customer = await this.findOne(id);
+    this.customerRepo.merge(customer, payload);
+    const updatedCustomer = this.customerRepo
+      .save(customer)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw new BadRequestException(`${err.message || 'Unexpected Error'}`);
+      });
 
-      return this.customers[index];
-    }
+    return updatedCustomer;
   }
 
-  delete(id: number) {
-    const customer = this.findOne(id);
-    if (customer) {
-      const index = this.customers.findIndex((item) => item.id === id);
-      this.customers.splice(index, 1);
-      return { message: `customer with id ${id} deleted` };
-    }
+  async delete(id: number) {
+    await this.findOne(id);
+    this.customerRepo.delete(id);
+    return { message: `customer with id ${id} deleted` };
   }
 }
