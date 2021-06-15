@@ -13,7 +13,7 @@ import { Repository } from 'typeorm';
 export class UsersService {
   constructor(
     private productService: ProductsService,
-    @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(User, 'mysqlDB') private userRepo: Repository<User>,
   ) {}
 
   create(payload: CreateUsersDto) {

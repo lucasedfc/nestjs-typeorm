@@ -11,7 +11,8 @@ import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customers.dto';
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectRepository(Customer) private customerRepo: Repository<Customer>,
+    @InjectRepository(Customer, 'mysqlDB')
+    private customerRepo: Repository<Customer>,
   ) {}
 
   create(payload: CreateCustomerDto) {

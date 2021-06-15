@@ -11,7 +11,8 @@ import { Category } from '../entities/categories.entity';
 @Injectable()
 export class CategoriesService {
   constructor(
-    @InjectRepository(Category) private categoryRepo: Repository<Category>,
+    @InjectRepository(Category, 'mysqlDB')
+    private categoryRepo: Repository<Category>,
   ) {}
 
   create(payload: CreateCategoryDto) {

@@ -11,7 +11,8 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(Product) private productRepo: Repository<Product>,
+    @InjectRepository(Product, 'mysqlDB')
+    private productRepo: Repository<Product>,
   ) {}
 
   findAll() {

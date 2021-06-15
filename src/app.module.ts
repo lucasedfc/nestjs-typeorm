@@ -8,7 +8,7 @@ import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { environment } from './environment';
 import config from './config';
-import pgSchema from './database/configSchema';
+import { mysqlSchema } from './database/configSchema';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import pgSchema from './database/configSchema';
       envFilePath: environment[process.env.NODE_ENV] || '.env',
       isGlobal: true,
       load: [config],
-      validationSchema: pgSchema,
+      validationSchema: mysqlSchema,
     }),
   ],
   controllers: [AppController],

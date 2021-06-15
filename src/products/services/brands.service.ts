@@ -10,7 +10,9 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class BrandsService {
-  constructor(@InjectRepository(Brand) private brandRepo: Repository<Brand>) {}
+  constructor(
+    @InjectRepository(Brand, 'mysqlDB') private brandRepo: Repository<Brand>,
+  ) {}
 
   findAll() {
     return this.brandRepo.find();

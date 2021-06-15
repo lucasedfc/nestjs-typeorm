@@ -9,7 +9,10 @@ import { CustomersService } from './services/customers.service';
 import { UsersService } from './services/users.service';
 
 @Module({
-  imports: [ProductsModule, TypeOrmModule.forFeature([User, Customer])],
+  imports: [
+    ProductsModule,
+    TypeOrmModule.forFeature([User, Customer], 'mysqlDB'),
+  ],
   controllers: [UsersController, CustomersController],
   providers: [UsersService, CustomersService],
 })

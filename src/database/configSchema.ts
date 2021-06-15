@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 
-const pgSchema = Joi.object({
+export const pgSchema = Joi.object({
   API_KEY: Joi.number().required(),
   POSTGRES_DB: Joi.string().required(),
   POSTGRES_USER: Joi.string().required(),
@@ -10,4 +10,10 @@ const pgSchema = Joi.object({
   PORT: Joi.number().required(),
 });
 
-export default pgSchema;
+export const mysqlSchema = Joi.object({
+  MYSQL_DB: Joi.string().required(),
+  MYSQL_USER: Joi.string().required(),
+  MYSQL_PASSWORD: Joi.string().required(),
+  MYSQL_HOST: Joi.string().required(),
+  MYSQL_PORT: Joi.number().required(),
+});
