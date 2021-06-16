@@ -8,16 +8,22 @@ import { CreateUsersDto, UpdateUsersDto } from 'src/users/dtos/users.dto';
 import { User } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomersService } from './customers.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private productService: ProductsService,
+    private customerService: CustomersService,
     @InjectRepository(User) private userRepo: Repository<User>,
   ) {}
 
-  create(payload: CreateUsersDto) {
+  async create(payload: CreateUsersDto) {
     const user = this.userRepo.create(payload);
+    if (payload.customerId) {
+      const customer = await this.customerService.findOne(payload.customerId);
+      user.customer = customer;
+    }
     const newUser = this.userRepo
       .save(user)
       .then((res) => {
@@ -31,7 +37,9 @@ export class UsersService {
   }
 
   findAll() {
-    return this.userRepo.find();
+    return this.userRepo.find({
+      relations: ['customer'],
+    });
   }
 
   async findOne(id: number) {
