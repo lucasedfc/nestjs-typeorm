@@ -1,18 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { Product } from 'src/products/entities/product.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Customer } from './customer.entity';
-import { OrderItems } from './order-item.entity';
+import { Order } from './order.entity';
 
 @Entity()
-export class Order {
-  @ApiProperty()
+export class OrderItems {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,9 +26,14 @@ export class Order {
   })
   updateAt: Date;
 
-  @ManyToOne(() => Customer, (customer) => customer.orders)
-  customer: Customer;
+  @Column({
+    type: 'int',
+  })
+  quantity: number;
 
-  @OneToMany(() => OrderItems, (item) => item.order)
-  items: OrderItems[];
+  @ManyToOne(() => Product)
+  product: Product;
+
+  @ManyToOne(() => Order, (order) => order.items)
+  order: Order;
 }
