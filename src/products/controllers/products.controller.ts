@@ -8,9 +8,14 @@ import {
   Put,
   HttpCode,
   HttpStatus,
+  Query,
   //ParseIntPipe,
 } from '@nestjs/common';
-import { CreateProductDto, UpdateProductDto } from './../dtos/products.dto';
+import {
+  CreateProductDto,
+  FilterProductsDto,
+  UpdateProductDto,
+} from './../dtos/products.dto';
 import { ProductsService } from '../services/products.service';
 import { ParseIntPipe } from '../../shared/parse-int.pipe';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -20,9 +25,8 @@ export class ProductsController {
   constructor(private productService: ProductsService) {}
   @Get('')
   @ApiOperation({ summary: 'List All Products' })
-  // eslint-disable-next-line prettier/prettier
-  getProducts /*  @Query('limit') limit = 100, */ /*  @Query('offset') offset = 0, */ /*  @Query('brand') brand: string, */() {
-    return this.productService.findAll();
+  getProducts(@Query() params: FilterProductsDto) {
+    return this.productService.findAll(params);
   }
 
   @Get(':productId')

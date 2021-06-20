@@ -14,6 +14,9 @@ async function bootstrap() {
       whitelist: true /* Avoid field not declared in DTO*/,
       forbidNonWhitelisted:
         true /* Throw error with fields not declared in DTO */,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 
