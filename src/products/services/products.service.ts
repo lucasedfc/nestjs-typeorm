@@ -7,27 +7,37 @@ import { CreateProductDto, UpdateProductDto } from '../dtos/products.dto';
 import { Product } from '../entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { BrandsService } from './brands.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
+    private brandService: BrandsService,
     @InjectRepository(Product) private productRepo: Repository<Product>,
   ) {}
 
   findAll() {
-    return this.productRepo.find();
+    return this.productRepo.find({
+      relations: ['brand'],
+    });
   }
 
   async findOne(id: number) {
-    const product = await this.productRepo.findOne(id);
+    const product = await this.productRepo.findOne(id, {
+      relations: ['brand'],
+    });
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
     return product;
   }
 
-  create(payload: CreateProductDto) {
+  async create(payload: CreateProductDto) {
     const newProduct = this.productRepo.create(payload);
+    if (payload.brandId) {
+      const brand = await this.brandService.findOne(payload.brandId);
+      newProduct.brand = brand;
+    }
     const product = this.productRepo
       .save(newProduct)
       .then((res) => {
@@ -42,6 +52,10 @@ export class ProductsService {
 
   async update(id: number, payload: UpdateProductDto) {
     const product = await this.findOne(id);
+    if (payload.brandId) {
+      const brand = await this.brandService.findOne(payload.brandId);
+      product.brand = brand;
+    }
     this.productRepo.merge(product, payload);
     return this.productRepo.save(product);
   }
