@@ -7,7 +7,7 @@ export class CreateBrandsDto {
   readonly name: string;
   @IsNotEmpty()
   @IsString()
-  readonly description: string;
+  readonly image: string;
 }
 
 export class UpdateBrandsDto extends PartialType(CreateBrandsDto) {}

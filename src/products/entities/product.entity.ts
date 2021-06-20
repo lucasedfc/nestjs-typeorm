@@ -5,7 +5,9 @@ import {
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { Brand } from './brand.entity';
 @Entity()
 export class Product {
   @ApiProperty()
@@ -38,4 +40,7 @@ export class Product {
 
   @Column({ type: 'varchar' })
   image: string;
+
+  @ManyToOne(() => Brand, (brand) => brand.products)
+  brand: Brand;
 }
