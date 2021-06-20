@@ -76,4 +76,33 @@ export class ProductsService {
       message: `Product with id ${id} deleted`,
     };
   }
+
+  async removeCategoryByProduct(productId: number, categoryId: number) {
+    const product = await this.productRepo.findOne(productId, {
+      relations: ['categories'],
+    });
+    product.categories = product.categories.filter(
+      (item) => item.id !== categoryId,
+    );
+    return this.productRepo.save(product);
+  }
+
+  async addCategoryByProduct(productId: number, categoryId: number) {
+    const product = await this.productRepo.findOne(productId, {
+      relations: ['categories'],
+    });
+    if (!product) {
+      throw new NotFoundException(`Product ${productId} not found`);
+    }
+    const category = await this.categoryRepo.findOne(categoryId);
+    if (!category) {
+      throw new NotFoundException(`Category ${categoryId} not found`);
+    }
+
+    if (!product.categories.find((item) => item.id == categoryId)) {
+      product.categories.push(category);
+    }
+
+    return this.productRepo.save(product);
+  }
 }
