@@ -7,13 +7,15 @@ import { CreateProductDto, UpdateProductDto } from '../dtos/products.dto';
 import { Product } from '../entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BrandsService } from './brands.service';
+import { Category } from '../entities/categories.entity';
+import { Brand } from '../entities/brand.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    private brandService: BrandsService,
     @InjectRepository(Product) private productRepo: Repository<Product>,
+    @InjectRepository(Category) private categoryRepo: Repository<Category>,
+    @InjectRepository(Brand) private brandRepo: Repository<Brand>,
   ) {}
 
   findAll() {
@@ -24,7 +26,7 @@ export class ProductsService {
 
   async findOne(id: number) {
     const product = await this.productRepo.findOne(id, {
-      relations: ['brand'],
+      relations: ['brand', 'categories'],
     });
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
@@ -35,8 +37,15 @@ export class ProductsService {
   async create(payload: CreateProductDto) {
     const newProduct = this.productRepo.create(payload);
     if (payload.brandId) {
-      const brand = await this.brandService.findOne(payload.brandId);
+      const brand = await this.brandRepo.findOne(payload.brandId);
       newProduct.brand = brand;
+    }
+
+    if (payload.categoriesId) {
+      const categories = await this.categoryRepo.findByIds(
+        payload.categoriesId,
+      );
+      newProduct.categories = categories;
     }
     const product = this.productRepo
       .save(newProduct)
@@ -53,7 +62,7 @@ export class ProductsService {
   async update(id: number, payload: UpdateProductDto) {
     const product = await this.findOne(id);
     if (payload.brandId) {
-      const brand = await this.brandService.findOne(payload.brandId);
+      const brand = await this.brandRepo.findOne(payload.brandId);
       product.brand = brand;
     }
     this.productRepo.merge(product, payload);

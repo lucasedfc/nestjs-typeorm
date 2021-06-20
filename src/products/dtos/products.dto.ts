@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsPositive,
   Max,
+  IsArray,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -31,6 +32,10 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsPositive()
   readonly brandId: number;
+
+  @IsNotEmpty()
+  @IsArray()
+  readonly categoriesId: number[];
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
