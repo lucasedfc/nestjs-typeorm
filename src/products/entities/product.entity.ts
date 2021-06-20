@@ -8,10 +8,12 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
+  Index,
 } from 'typeorm';
 import { Brand } from './brand.entity';
 import { Category } from './categories.entity';
 @Entity()
+@Index(['price', 'stock'])
 export class Product {
   @ApiProperty()
   @PrimaryGeneratedColumn()
