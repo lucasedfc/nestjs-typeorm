@@ -8,13 +8,13 @@ import { ApiKeyGuard } from './auth/guards/api-key.guard';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Public()
   @Get()
   getHello(): { [key: string]: string } {
     return this.appService.getHello();
   }
 
   @Get('test')
-  @Public()
   test() {
     return {
       message: 'Test',

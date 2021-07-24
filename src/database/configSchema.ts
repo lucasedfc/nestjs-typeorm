@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 
 const pgSchema = Joi.object({
-  API_KEY: Joi.number().required(),
+  API_KEY: Joi.string().required(),
   POSTGRES_DB: Joi.string().required(),
   POSTGRES_USER: Joi.string().required(),
   POSTGRES_PASSWORD: Joi.string().required(),
