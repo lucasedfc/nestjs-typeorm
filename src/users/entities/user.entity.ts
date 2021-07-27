@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -19,8 +20,9 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
+  @Exclude()
   @Column({ type: 'varchar', length: 100 })
-  password: string; // encrypt
+  password: string;
 
   @Column({ type: 'varchar', length: 100 })
   role: string;
@@ -42,4 +44,8 @@ export class User {
     name: 'customer_id',
   })
   customer: Customer;
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
 }
