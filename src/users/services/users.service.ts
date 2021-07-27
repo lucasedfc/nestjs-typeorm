@@ -30,7 +30,6 @@ export class UsersService {
     const newUser = this.userRepo
       .save(user)
       .then((res) => {
-        console.log(res);
         return res;
       })
       .catch((err) => {
@@ -44,6 +43,10 @@ export class UsersService {
     return this.userRepo.find({
       relations: ['customer'],
     });
+  }
+
+  findByEmail(email: string) {
+    return this.userRepo.findOne({ where: { email } });
   }
 
   async findOne(id: number) {
