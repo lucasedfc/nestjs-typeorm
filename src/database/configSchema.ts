@@ -8,6 +8,7 @@ const pgSchema = Joi.object({
   POSTGRES_HOST: Joi.string().required(),
   POSTGRES_PORT: Joi.number().required(),
   PORT: Joi.number().required(),
+  JWT_SECRET: Joi.string().required(),
 });
 
 export default pgSchema;
