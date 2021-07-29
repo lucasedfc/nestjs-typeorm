@@ -20,18 +20,21 @@ import {
 import { ProductsService } from '../services/products.service';
 import { ParseIntPipe } from '../../shared/parse-int.pipe';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-@UseGuards(AuthGuard('jwt'))
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
+@UseGuards(JwtAuthGuard)
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
   constructor(private productService: ProductsService) {}
+  @Public()
   @Get('')
   @ApiOperation({ summary: 'List All Products' })
   getProducts(@Query() params: FilterProductsDto) {
     return this.productService.findAll(params);
   }
 
+  @Public()
   @Get(':productId')
   @ApiOperation({ summary: 'Get One Product' })
   @HttpCode(HttpStatus.ACCEPTED)
