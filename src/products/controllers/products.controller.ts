@@ -22,7 +22,10 @@ import { ParseIntPipe } from '../../shared/parse-int.pipe';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
-@UseGuards(JwtAuthGuard)
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/models/roles';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
@@ -42,6 +45,7 @@ export class ProductsController {
     return this.productService.findOne(productId);
   }
 
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() payload: CreateProductDto) {
     return this.productService.create(payload);
