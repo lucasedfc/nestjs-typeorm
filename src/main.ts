@@ -1,11 +1,12 @@
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
   SwaggerModule,
   DocumentBuilder,
   SwaggerCustomOptions,
 } from '@nestjs/swagger';
+import { CustomInterceptor } from './custom.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,8 +21,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-
+  app.useGlobalInterceptors(new CustomInterceptor());
   const customOptions: SwaggerCustomOptions = {
     swaggerOptions: {
       persistAuthorization: true,
