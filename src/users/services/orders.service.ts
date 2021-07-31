@@ -4,11 +4,13 @@ import { Repository } from 'typeorm';
 import { CreateOrderDto, UpdateOrderDto } from '../dtos/order.dto';
 import { Customer } from '../entities/customer.entity';
 import { Order } from '../entities/order.entity';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order) private orderRepo: Repository<Order>,
+    @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Customer) private customerRepo: Repository<Customer>,
   ) {}
 
@@ -24,6 +26,22 @@ export class OrdersService {
       throw new NotFoundException(`order with id ${id} not exist`);
     }
     return customer;
+  }
+
+  async ordersByCustomer(userId: number) {
+    const user: User = await this.userRepo.findOne(userId, {
+      relations: ['customer'],
+    });
+    if (user) {
+      return this.orderRepo.find({
+        where: {
+          customer: user.customer.id,
+        },
+        relations: ['items', 'items.product'],
+      });
+    } else {
+      throw new NotFoundException(`Invalid User`);
+    }
   }
 
   async create(payload: CreateOrderDto) {

@@ -7,6 +7,7 @@ import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { environment } from './environment';
+import { AuthModule } from './auth/auth.module';
 import config from './config';
 import pgSchema from './database/configSchema';
 
@@ -22,6 +23,7 @@ import pgSchema from './database/configSchema';
       load: [config],
       validationSchema: pgSchema,
     }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
